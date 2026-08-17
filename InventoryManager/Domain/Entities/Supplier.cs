@@ -1,35 +1,34 @@
 ﻿using InventoryManager.Domain.Exceptions;
+using System.Text.RegularExpressions;
 
 namespace InventoryManager.Domain.Entities
 {
-	public class Category
+	public class Supplier
 	{
 		public int Id { get; private set; }
 		public string Name { get; private set; }
-		public string Description { get; private set; }
+		public string Phone { get; private set; }
 		public bool IsActive { get; private set; }
 
-
+		public Supplier (string name, string phone)
+		{
+			Name = HandleName (name);
+			Phone = HandlePhone (phone);
+			IsActive = true;
+		}
 
 		public void SetId (int id)
 		{
 			Id = id;
 		}
-		public Category (string name, string description)
-		{
-			Name = HandleName (name);
-			Description = HandleDescription (description);
-			IsActive = true;
-		}
-
 		public void Rename (string newName)
 		{
 			Name = HandleName (newName);
 		}
 
-		public void ChangeDescription (string newDescription)
+		public void ChangePhone (string newPhone)
 		{
-			Description = HandleDescription (newDescription);
+			Phone = HandlePhone (newPhone);
 		}
 
 		public void Activate ()
@@ -54,19 +53,16 @@ namespace InventoryManager.Domain.Entities
 			}
 		}
 
-		private string HandleDescription (string description)
+		private string HandlePhone(string phone)
 		{
-			if (string.IsNullOrWhiteSpace (description))
+			if (string.IsNullOrWhiteSpace (phone) || !Regex.IsMatch(phone.Trim(), @"^\+?[0-9]{7,15}$"))
 			{
-				return string.Empty;
+				throw new InvalidPhoneException ();
 			}
-
-			if (description.Length > 500)
+			else
 			{
-				throw new DescriptionTooLongException ();
+				return phone.Trim ();
 			}
-
-			return description.Trim ();
 		}
 	}
 }

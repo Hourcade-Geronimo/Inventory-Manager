@@ -5,44 +5,50 @@ namespace InventoryManager.Domain.Entities
 	public class Product
 	{
 
-		public int Id {get; }
+		public int Id { get; private set; }
 		public int CategoryId { get; }
-		public string Name {get; private set;}
+		public int SupplierId { get; }
+		public string Name { get; private set; }
 		public string Sku { get; }
-		public decimal Price {get; private set;}
-		public int Stock {get; private set;}
-		public bool IsActive {get; private set;}
+		public decimal Price { get; private set; }
+		public int Stock { get; private set; }
+		public bool IsActive { get; private set; }
 
 
 
-		public Product(string name, string sku, decimal price, int stock)
+		public Product (int categoryId, int supplierId, string name, string sku, decimal price, int stock)
 		{
-			Name = HandleName(name);
-			Price = HandlePrice(price);
-			Stock = HandleStock(stock);
-			Sku = HandleSku(sku);
-			CategoryId = 0;
+			Name = HandleName (name);
+			Price = HandlePrice (price);
+			Stock = HandleStock (stock);
+			Sku = HandleSku (sku);
+			CategoryId = HandleId (categoryId);
+			SupplierId = HandleId (supplierId);
 			IsActive = true;
 		}
 
-		public decimal HandlePrice(decimal price)
+		public void SetId (int id)
 		{
-			if(price <= 0)
+			Id = id;
+		}
+		private decimal HandlePrice (decimal price)
+		{
+			if (price <= 0)
 			{
-				throw new NegativeOrZeroPriceException();
+				throw new NegativeOrZeroPriceException ();
 			}
 			else
 			{
 				return price;
 			}
-				
+
 		}
 
-		public void ChangePrice(decimal newPrice)
+		public void ChangePrice (decimal newPrice)
 		{
-			if(newPrice <= 0)
+			if (newPrice <= 0)
 			{
-				throw new NegativeOrZeroPriceException();
+				throw new NegativeOrZeroPriceException ();
 			}
 			else
 			{
@@ -50,39 +56,39 @@ namespace InventoryManager.Domain.Entities
 			}
 		}
 
-		public int HandleStock(int stock)
+		private int HandleStock (int stock)
 		{
-			if(stock < 0)
+			if (stock < 0)
 			{
-				throw new NegativeOrZeroQuantityException();
+				throw new NegativeOrZeroQuantityException ();
 			}
 			else
 			{
-				return stock;	
+				return stock;
 			}
 		}
 
-		public void AddStock(int quantity)
+		public void AddStock (int quantity)
 		{
-			if(quantity < 0)
+			if (quantity <= 0)
 			{
-				throw new NegativeOrZeroQuantityException();
+				throw new NegativeOrZeroQuantityException ();
 			}
 			else
 			{
-				Stock += quantity;	
+				Stock += quantity;
 			}
 		}
 
-		public void RemoveStock(int quantity)
+		public void RemoveStock (int quantity)
 		{
-			if(quantity <= 0)
+			if (quantity <= 0)
 			{
-				throw new NegativeOrZeroQuantityException();
+				throw new NegativeOrZeroQuantityException ();
 			}
 			else if (quantity > Stock)
 			{
-				throw new InsufficientStockException();		
+				throw new InsufficientStockException ();
 			}
 			else
 			{
@@ -90,35 +96,51 @@ namespace InventoryManager.Domain.Entities
 			}
 		}
 
-		public string HandleName(string name)
+		private string HandleName (string name)
 		{
-			if (string.IsNullOrWhiteSpace(name))
+			if (string.IsNullOrWhiteSpace (name))
 			{
-				throw new InvalidNameException();
+				throw new InvalidNameException ();
 			}
 			else
 			{
-				return name.Trim();
+				return name.Trim ();
 			}
 		}
 
 		public void Rename (string newName)
 		{
 			if (string.IsNullOrWhiteSpace (newName))
-				throw new InvalidNameException();
-
-			Name = newName;
-		}
-
-		private String HandleSku(string sku)
-		{
-			if(string.IsNullOrWhiteSpace(sku))
 			{
-				throw new InvalidNameException();
+				throw new InvalidNameException ();
 			}
 			else
 			{
-				return sku;	
+				Name = newName.Trim ();
+			}
+		}
+
+		private string HandleSku (string sku)
+		{
+			if (string.IsNullOrWhiteSpace (sku))
+			{
+				throw new InvalidNameException ();
+			}
+			else
+			{
+				return sku.Trim ();
+			}
+		}
+
+		private int HandleId (int categoryId)
+		{
+			if (categoryId <= 0)
+			{
+				throw new NegativeOrZeroIDException ();
+			}
+			else
+			{
+				return categoryId;
 			}
 		}
 	}
