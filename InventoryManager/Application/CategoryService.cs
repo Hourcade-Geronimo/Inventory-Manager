@@ -26,5 +26,15 @@ namespace InventoryManager.Application
 		{
 			return _repository.GetById (id);
 		}
+
+		public void UpdateCategory (Category category)
+		{
+			_repository.Update (category);
+		}
+
+		public void DeleteCategory (int id)
+		{
+			_repository.Delete (id);
+		}
 	}
 }

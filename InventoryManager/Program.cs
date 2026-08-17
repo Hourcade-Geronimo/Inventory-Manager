@@ -10,12 +10,15 @@ namespace InventoryManager
 		{
 			InMemoryProductRepository productRepository = new InMemoryProductRepository ();
 			InMemoryCategoryRepository categoryRepository = new InMemoryCategoryRepository ();
-			InventoryService productService = new InventoryService (productRepository);
+			InMemorySupplierRepository supplierRepository = new InMemorySupplierRepository ();
+
+			ProductService productService = new ProductService (productRepository);
 			CategoryService categoryService = new CategoryService (categoryRepository);
+			SupplierService supplierService = new SupplierService (supplierRepository);
 
 			int opcion = 0;
 
-			while (opcion != 5)
+			while (opcion != 7)
 			{
 				Console.Clear ();
 
@@ -24,9 +27,11 @@ namespace InventoryManager
 				Console.WriteLine ("================================");
 				Console.WriteLine ("1. Agregar producto");
 				Console.WriteLine ("2. Agregar categoría");
-				Console.WriteLine ("3. Listar productos");
-				Console.WriteLine ("4. Listar categorías");
-				Console.WriteLine ("5. Salir");
+				Console.WriteLine ("3. Agregar proveedor");
+				Console.WriteLine ("4. Listar productos");
+				Console.WriteLine ("5. Listar categorías");
+				Console.WriteLine ("6. Listar proveedores");
+				Console.WriteLine ("7. Salir");
 				Console.WriteLine ("================================");
 				Console.Write ("Elegí una opción: ");
 
@@ -47,6 +52,7 @@ namespace InventoryManager
 						Console.Clear ();
 
 						IEnumerable<Category> categories = categoryService.GetCategories ();
+						IEnumerable<Supplier> suppliers = supplierService.GetSuppliers ();
 
 						if (!categories.Any ())
 						{
@@ -55,15 +61,28 @@ namespace InventoryManager
 							break;
 						}
 
+						if (!suppliers.Any ())
+						{
+							Console.WriteLine ("No podés crear un producto.");
+							Console.WriteLine ("Primero tenés que crear al menos un proveedor.");
+							break;
+						}
+
 						Console.WriteLine ("=== AGREGAR PRODUCTO ===");
 						Console.WriteLine ();
+
+						// -----------------------------------------
+						// CATEGORÍA
+						// -----------------------------------------
 
 						Console.WriteLine ("¿A qué categoría pertenece?");
 						Console.WriteLine ();
 
 						foreach (Category category in categories)
 						{
-							Console.WriteLine ($"{category.Id}. {category.Name}");
+							Console.WriteLine (
+								$"{category.Id}. {category.Name}"
+							);
 						}
 
 						Console.WriteLine ();
@@ -85,6 +104,44 @@ namespace InventoryManager
 							break;
 						}
 
+						// -----------------------------------------
+						// PROVEEDOR
+						// -----------------------------------------
+
+						Console.WriteLine ();
+						Console.WriteLine ("¿Cuál es el proveedor?");
+						Console.WriteLine ();
+
+						foreach (Supplier supplier in suppliers)
+						{
+							Console.WriteLine (
+								$"{supplier.Id}. {supplier.Name} - {supplier.Phone}"
+							);
+						}
+
+						Console.WriteLine ();
+						Console.Write ("ID de proveedor: ");
+
+						if (!int.TryParse (Console.ReadLine (), out int supplierId))
+						{
+							Console.WriteLine ("ID inválido.");
+							break;
+						}
+
+						Supplier? supplierSelected = supplierService.GetById (supplierId);
+
+						if (supplierSelected == null)
+						{
+							Console.WriteLine (
+								"No existe un proveedor con ese ID."
+							);
+							break;
+						}
+
+						// -----------------------------------------
+						// DATOS DEL PRODUCTO
+						// -----------------------------------------
+
 						Console.WriteLine ();
 						Console.Write ("Nombre: ");
 						string name = Console.ReadLine ();
@@ -94,7 +151,9 @@ namespace InventoryManager
 
 						Console.Write ("Precio: ");
 
-						if (!decimal.TryParse (Console.ReadLine (), out decimal price))
+						if (!decimal.TryParse (
+							Console.ReadLine (),
+							out decimal price))
 						{
 							Console.WriteLine ("Precio inválido.");
 							break;
@@ -102,7 +161,9 @@ namespace InventoryManager
 
 						Console.Write ("Stock: ");
 
-						if (!int.TryParse (Console.ReadLine (), out int stock))
+						if (!int.TryParse (
+							Console.ReadLine (),
+							out int stock))
 						{
 							Console.WriteLine ("Stock inválido.");
 							break;
@@ -112,6 +173,7 @@ namespace InventoryManager
 						{
 							Product product = new Product (
 								categorySelected.Id,
+								supplierSelected.Id,
 								name,
 								sku,
 								price,
@@ -122,12 +184,9 @@ namespace InventoryManager
 
 							Console.WriteLine ();
 							Console.WriteLine ("Producto agregado correctamente.");
-							Console.WriteLine (
-								$"ID: {product.Id}"
-							);
-							Console.WriteLine (
-								$"Categoría: {categorySelected.Name}"
-							);
+							Console.WriteLine ($"ID: {product.Id}");
+							Console.WriteLine ($"Categoría: {categorySelected.Name}");
+							Console.WriteLine ($"Proveedor: {supplierSelected.Name}");
 						}
 						catch (Exception ex)
 						{
@@ -157,13 +216,63 @@ namespace InventoryManager
 
 						try
 						{
-							Category category = new Category (name, description);
+							Category category = new Category (
+								name,
+								description
+							);
 
 							categoryService.AddCategory (category);
 
 							Console.WriteLine ();
-							Console.WriteLine ("Categoría agregada correctamente.");
-							Console.WriteLine ($"ID generado: {category.Id}");
+							Console.WriteLine (
+								"Categoría agregada correctamente."
+							);
+							Console.WriteLine (
+								$"ID generado: {category.Id}"
+							);
+						}
+						catch (Exception ex)
+						{
+							Console.WriteLine ();
+							Console.WriteLine ($"Error: {ex.Message}");
+						}
+
+						break;
+					}
+
+
+					// =========================================
+					// AGREGAR PROVEEDOR
+					// =========================================
+					case 3:
+					{
+						Console.Clear ();
+
+						Console.WriteLine ("=== AGREGAR PROVEEDOR ===");
+						Console.WriteLine ();
+
+						Console.Write ("Nombre: ");
+						string name = Console.ReadLine ();
+
+						Console.Write ("Teléfono: ");
+						string phone = Console.ReadLine ();
+
+						try
+						{
+							Supplier supplier = new Supplier (
+								name,
+								phone
+							);
+
+							supplierService.AddSupplier (supplier);
+
+							Console.WriteLine ();
+							Console.WriteLine (
+								"Proveedor agregado correctamente."
+							);
+							Console.WriteLine (
+								$"ID generado: {supplier.Id}"
+							);
 						}
 						catch (Exception ex)
 						{
@@ -178,36 +287,63 @@ namespace InventoryManager
 					// =========================================
 					// LISTAR PRODUCTOS
 					// =========================================
-					case 3:
+					case 4:
 					{
 						Console.Clear ();
 
 						Console.WriteLine ("=== LISTADO DE PRODUCTOS ===");
 						Console.WriteLine ();
 
-						IEnumerable<Product> products = productService.GetProducts ();
+						IEnumerable<Product> products =
+							productService.GetProducts ();
 
 						if (!products.Any ())
 						{
-							Console.WriteLine ("No hay productos registrados.");
+							Console.WriteLine (
+								"No hay productos registrados."
+							);
 							break;
 						}
 
 						foreach (Product product in products)
 						{
-							Category? category = categoryService.GetById (product.CategoryId);
+							Category? category =
+								categoryService.GetById (
+									product.CategoryId
+								);
 
-							string categoryName = category?.Name ?? "Categoría no encontrada";
+							Supplier? supplier =
+								supplierService.GetById (
+									product.SupplierId
+								);
+
+							string categoryName =
+								category?.Name ??
+								"Categoría no encontrada";
+
+							string supplierName =
+								supplier?.Name ??
+								"Proveedor no encontrado";
 
 							Console.WriteLine (
 								$"ID: {product.Id} | " +
 								$"Nombre: {product.Name} | " +
 								$"SKU: {product.Sku} | " +
 								$"Precio: ${product.Price} | " +
-								$"Stock: {product.Stock} | " +
-								$"Categoría: {categoryName} " +
+								$"Stock: {product.Stock}"
+							);
+
+							Console.WriteLine (
+								$"   Categoría: {categoryName} " +
 								$"(ID: {product.CategoryId})"
 							);
+
+							Console.WriteLine (
+								$"   Proveedor: {supplierName} " +
+								$"(ID: {product.SupplierId})"
+							);
+
+							Console.WriteLine ();
 						}
 
 						break;
@@ -217,18 +353,21 @@ namespace InventoryManager
 					// =========================================
 					// LISTAR CATEGORÍAS
 					// =========================================
-					case 4:
+					case 5:
 					{
 						Console.Clear ();
 
 						Console.WriteLine ("=== LISTADO DE CATEGORÍAS ===");
 						Console.WriteLine ();
 
-						IEnumerable<Category> categories = categoryService.GetCategories ();
+						IEnumerable<Category> categories =
+							categoryService.GetCategories ();
 
 						if (!categories.Any ())
 						{
-							Console.WriteLine ("No hay categorías registradas.");
+							Console.WriteLine (
+								"No hay categorías registradas."
+							);
 							break;
 						}
 
@@ -247,9 +386,44 @@ namespace InventoryManager
 
 
 					// =========================================
+					// LISTAR PROVEEDORES
+					// =========================================
+					case 6:
+					{
+						Console.Clear ();
+
+						Console.WriteLine ("=== LISTADO DE PROVEEDORES ===");
+						Console.WriteLine ();
+
+						IEnumerable<Supplier> suppliers =
+							supplierService.GetSuppliers ();
+
+						if (!suppliers.Any ())
+						{
+							Console.WriteLine (
+								"No hay proveedores registrados."
+							);
+							break;
+						}
+
+						foreach (Supplier supplier in suppliers)
+						{
+							Console.WriteLine (
+								$"ID: {supplier.Id} | " +
+								$"Nombre: {supplier.Name} | " +
+								$"Teléfono: {supplier.Phone} | " +
+								$"Activo: {supplier.IsActive}"
+							);
+						}
+
+						break;
+					}
+
+
+					// =========================================
 					// SALIR
 					// =========================================
-					case 5:
+					case 7:
 					{
 						Console.WriteLine ();
 						Console.WriteLine ("¡Hasta luego!");
@@ -265,10 +439,12 @@ namespace InventoryManager
 					}
 				}
 
-				if (opcion != 5)
+				if (opcion != 7)
 				{
 					Console.WriteLine ();
-					Console.WriteLine ("Presioná ENTER para continuar...");
+					Console.WriteLine (
+						"Presioná ENTER para continuar..."
+					);
 					Console.ReadLine ();
 				}
 			}
