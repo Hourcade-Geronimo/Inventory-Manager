@@ -38,7 +38,7 @@ namespace InventoryManager.Infrastructure.Repositories
 
 		public void Update (Category entity)
 		{
-			Category category = GetById (entity.Id);
+			Category? category = GetById (entity.Id);
 
 			if (category != null)
 			{

@@ -7,6 +7,7 @@ namespace InventoryManager.Domain.Entities
 
 		public int Id { get; private set; }
 		public int CategoryId { get; }
+		public int SupplierId { get; }
 		public string Name { get; private set; }
 		public string Sku { get; }
 		public decimal Price { get; private set; }
@@ -15,13 +16,14 @@ namespace InventoryManager.Domain.Entities
 
 
 
-		public Product (int categoryId, string name, string sku, decimal price, int stock)
+		public Product (int categoryId, int supplierId, string name, string sku, decimal price, int stock)
 		{
 			Name = HandleName (name);
 			Price = HandlePrice (price);
 			Stock = HandleStock (stock);
 			Sku = HandleSku (sku);
-			CategoryId = HandleCategoryId (categoryId);
+			CategoryId = HandleId (categoryId);
+			SupplierId = HandleId (supplierId);
 			IsActive = true;
 		}
 
@@ -126,11 +128,11 @@ namespace InventoryManager.Domain.Entities
 			}
 			else
 			{
-				return sku;
+				return sku.Trim ();
 			}
 		}
 
-		private int HandleCategoryId (int categoryId)
+		private int HandleId (int categoryId)
 		{
 			if (categoryId <= 0)
 			{
