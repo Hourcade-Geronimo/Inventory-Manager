@@ -25,7 +25,7 @@ namespace InventoryManager.Domain.Entities
 			IsActive = true;
 		}
 
-		public decimal HandlePrice(decimal price)
+		private decimal HandlePrice(decimal price)
 		{
 			if(price <= 0)
 			{
@@ -50,7 +50,7 @@ namespace InventoryManager.Domain.Entities
 			}
 		}
 
-		public int HandleStock(int stock)
+		private int HandleStock(int stock)
 		{
 			if(stock < 0)
 			{
@@ -64,7 +64,7 @@ namespace InventoryManager.Domain.Entities
 
 		public void AddStock(int quantity)
 		{
-			if(quantity < 0)
+			if(quantity <= 0)
 			{
 				throw new NegativeOrZeroQuantityException();
 			}
@@ -90,7 +90,7 @@ namespace InventoryManager.Domain.Entities
 			}
 		}
 
-		public string HandleName(string name)
+		private string HandleName(string name)
 		{
 			if (string.IsNullOrWhiteSpace(name))
 			{
@@ -105,9 +105,13 @@ namespace InventoryManager.Domain.Entities
 		public void Rename (string newName)
 		{
 			if (string.IsNullOrWhiteSpace (newName))
+			{
 				throw new InvalidNameException();
-
-			Name = newName;
+			}
+			else
+			{
+				Name = newName.Trim();
+			}
 		}
 
 		private String HandleSku(string sku)
