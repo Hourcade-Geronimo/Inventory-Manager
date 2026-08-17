@@ -6,23 +6,36 @@ namespace InventoryManager.Domain.Entities
 	{
 
 		public int Id {get; }
-		public int CategoryId { get; private set; }
+		public int CategoryId { get; }
 		public string Name {get; private set;}
-		public string Sku { get;}
+		public string Sku { get; }
 		public decimal Price {get; private set;}
 		public int Stock {get; private set;}
 		public bool IsActive {get; private set;}
 
 
 
-		public Product(string name, string sku, decimal price, int stock, int categoryId, bool isActive)
+		public Product(string name, string sku, decimal price, int stock)
 		{
-			HandleName(name);
-			ChangePrice(price);
-			AddStock(stock);
+			Name = HandleName(name);
+			Price = HandlePrice(price);
+			Stock = HandleStock(stock);
 			Sku = HandleSku(sku);
-			CategoryId = categoryId;
-			IsActive = isActive;
+			CategoryId = 0;
+			IsActive = true;
+		}
+
+		public decimal HandlePrice(decimal price)
+		{
+			if(price <= 0)
+			{
+				throw new NegativeOrZeroPriceException();
+			}
+			else
+			{
+				return price;
+			}
+				
 		}
 
 		public void ChangePrice(decimal newPrice)
@@ -37,6 +50,18 @@ namespace InventoryManager.Domain.Entities
 			}
 		}
 
+		public int HandleStock(int stock)
+		{
+			if(stock < 0)
+			{
+				throw new NegativeOrZeroQuantityException();
+			}
+			else
+			{
+				return stock;	
+			}
+		}
+
 		public void AddStock(int quantity)
 		{
 			if(quantity < 0)
@@ -47,7 +72,6 @@ namespace InventoryManager.Domain.Entities
 			{
 				Stock += quantity;	
 			}
-		
 		}
 
 		public void RemoveStock(int quantity)
@@ -66,26 +90,36 @@ namespace InventoryManager.Domain.Entities
 			}
 		}
 
-		public void HandleName(string name)
+		public string HandleName(string name)
 		{
 			if (string.IsNullOrWhiteSpace(name))
-				throw new InvalidProductNameException();
-
-			Name = name.Trim();
+			{
+				throw new InvalidNameException();
+			}
+			else
+			{
+				return name.Trim();
+			}
 		}
 
 		public void Rename (string newName)
 		{
 			if (string.IsNullOrWhiteSpace (newName))
-				throw new InvalidProductNameException();
+				throw new InvalidNameException();
 
 			Name = newName;
 		}
 
-		private string HandleSku(string sku)
+		private String HandleSku(string sku)
 		{
-			// todo: duplicated sku verification
-			return sku;
+			if(string.IsNullOrWhiteSpace(sku))
+			{
+				throw new InvalidNameException();
+			}
+			else
+			{
+				return sku;	
+			}
 		}
 	}
 }

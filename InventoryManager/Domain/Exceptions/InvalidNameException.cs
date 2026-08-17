@@ -1,6 +1,6 @@
 ﻿namespace InventoryManager.Domain.Exceptions
 {
-	internal class InvalidProductNameException : Exception
+	internal class InvalidNameException : Exception
 	{
 	//	todo
 	}

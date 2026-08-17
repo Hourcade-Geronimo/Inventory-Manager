@@ -3,31 +3,45 @@ using InventoryManager.Domain.Interfaces;
 
 namespace InventoryManager.Infrastructure.Repositories
 {
-	internal class InMemoryProductRepository : IRepository<Product>
+	public class InMemoryProductRepository : IRepository<Product>
 	{
+		
+		private readonly List<Product> _products = new List<Product>();
+
 		public void Add (Product entity)
 		{
-			throw new NotImplementedException ();
+			_products.Add(entity);
 		}
 
 		public void Delete (int id)
 		{
-			throw new NotImplementedException ();
+			Product? product = GetById(id);
+
+			if(product != null)
+			{
+				_products.Remove(product);
+			}
 		}
 
 		public IEnumerable<Product> GetAll ()
 		{
-			throw new NotImplementedException ();
+			return _products;
 		}
 
 		public Product? GetById (int id)
 		{
-			throw new NotImplementedException ();
+			return _products.FirstOrDefault(p => p.Id == id);
 		}
 
 		public void Update (Product entity)
 		{
-			throw new NotImplementedException ();
+			Product? product = GetById(entity.Id);
+
+			if(product != null)
+			{
+				int index = _products.IndexOf(product);
+				_products[index] = entity;
+			}
 		}
 	}
 }

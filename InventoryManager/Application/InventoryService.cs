@@ -12,29 +12,29 @@ namespace InventoryManager.Application
 			_repository = repository;
 		}
 
-		public void AddProduct (Product product)
+		public void AddProduct(Product product)
 		{
-			throw new NotImplementedException ();
+			_repository.Add(product);
 		}
 
-		public void DeleteProduct (string sku)
+		public void DeleteProduct(string sku)
 		{
-			throw new NotImplementedException ();
+			throw new NotImplementedException();
 		}
 
-		public Product GetBySku (string sku)
+		public Product GetBySku(string sku)
 		{
-			throw new NotImplementedException ();
+			throw new NotImplementedException();
 		}
 
-		public IEnumerable<Product> GetProducts ()
+		public IEnumerable<Product> GetProducts()
 		{
-			throw new NotImplementedException ();
+			return _repository.GetAll();
 		}
 
-		public void UpdateStock (string sku, int quantity)
+		public void UpdateStock(string sku, int quantity)
 		{
-			throw new NotImplementedException ();
+			throw new NotImplementedException();
 		}
 	}
 }
