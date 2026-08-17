@@ -1,14 +1,40 @@
 ﻿using InventoryManager.Domain.Entities;
+using InventoryManager.Domain.Interfaces;
 
-public interface IInventoryService
+namespace InventoryManager.Application
 {
-	void AddProduct (Product product);
+	public class InventoryService : IInventoryService
+	{
+		private readonly IRepository<Product> _repository;
 
-	IEnumerable<Product> GetProducts ();
+		public InventoryService(IRepository<Product> repository)
+		{
+			_repository = repository;
+		}
 
-	Product GetBySku (string sku);
+		public void AddProduct (Product product)
+		{
+			throw new NotImplementedException ();
+		}
 
-	void UpdateStock (string sku, int quantity);
+		public void DeleteProduct (string sku)
+		{
+			throw new NotImplementedException ();
+		}
 
-	void DeleteProduct (string sku);
+		public Product GetBySku (string sku)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public IEnumerable<Product> GetProducts ()
+		{
+			throw new NotImplementedException ();
+		}
+
+		public void UpdateStock (string sku, int quantity)
+		{
+			throw new NotImplementedException ();
+		}
+	}
 }

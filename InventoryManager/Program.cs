@@ -1,27 +1,54 @@
-﻿/*
-Crear productos.
-Ver productos.
-Aumentar stock.
-Disminuir stock.
-Evitar stock negativo.
-Buscar un producto.
-Calcular el valor total del inventario.
+﻿using InventoryManager.Application;
+using InventoryManager.Infrastructure.Repositories;
 
+namespace InventoryManager
+{
+	public class Program
+	{
+		public static void Main(string[] args)
+		{
+			InMemoryProductRepository productRepository = new InMemoryProductRepository();
+			InventoryService service = new InventoryService(productRepository);
 
-producto -> id, nombre, precio y stock || crear producto, agregar stock, quitar stock, buscar producto, listar productos
-*/
+			int opcion = 0;
 
-//var inventory = new Inventory();
+			while (opcion != 3)
+			{
+				Console.Clear();
 
-//inventory.AddProduct("teclado mecanico", 85000m, 10);
-//inventory.AddProduct("mouse", 50000m, 15);
+				Console.WriteLine("=== MENÚ DE PRODUCTOS ===");
+				Console.WriteLine("1. Agregar producto");
+				Console.WriteLine("2. Listar productos");
+				Console.WriteLine("3. Salir");
+				Console.Write("Elegí una opción: ");
 
-//inventory.RemoveStock(1, 3);
+				opcion = int.Parse(Console.ReadLine());
 
-//inventory.PrintProducts();
+				switch (opcion)
+				{
+					case 1:
+						Console.WriteLine("Agregando producto...");
+						break;
 
-// necesito dos clases, producto e inventario.
+					case 2:
+						Console.WriteLine("Listado de productos...");
+						break;
 
+					case 3:
+						Console.WriteLine("¡Hasta luego!");
+						break;
 
+					default:
+						Console.WriteLine("Opción inválida.");
+						break;
+				}
 
-
+				if (opcion != 3)
+				{
+					Console.WriteLine("\nPresioná ENTER para continuar...");
+					Console.ReadLine();
+				}
+			}
+		}
+	}
+}
