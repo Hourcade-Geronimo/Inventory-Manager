@@ -5,21 +5,24 @@ namespace InventoryManager.Infrastructure.Repositories
 {
 	public class InMemoryProductRepository : IRepository<Product>
 	{
-		
-		private readonly List<Product> _products = new List<Product>();
+		private readonly List<Product> _products = new List<Product> ();
+		private int _nextId = 1; //testing only, deleate after db exist
 
 		public void Add (Product entity)
 		{
-			_products.Add(entity);
+			entity.SetId (_nextId); // testing only, to deleate after db exist
+			_nextId++;
+
+			_products.Add (entity);
 		}
 
 		public void Delete (int id)
 		{
-			Product? product = GetById(id);
+			Product? product = GetById (id);
 
-			if(product != null)
+			if (product != null)
 			{
-				_products.Remove(product);
+				_products.Remove (product);
 			}
 		}
 
@@ -30,17 +33,17 @@ namespace InventoryManager.Infrastructure.Repositories
 
 		public Product? GetById (int id)
 		{
-			return _products.FirstOrDefault(p => p.Id == id);
+			return _products.FirstOrDefault (p => p.Id == id);
 		}
 
 		public void Update (Product entity)
 		{
-			Product? product = GetById(entity.Id);
+			Product? product = GetById (entity.Id);
 
-			if(product != null)
+			if (product != null)
 			{
-				int index = _products.IndexOf(product);
-				_products[index] = entity;
+				int index = _products.IndexOf (product);
+				_products [index] = entity;
 			}
 		}
 	}

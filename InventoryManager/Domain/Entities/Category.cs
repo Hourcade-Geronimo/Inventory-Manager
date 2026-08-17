@@ -4,53 +4,57 @@ namespace InventoryManager.Domain.Entities
 {
 	public class Category
 	{
-		public int Id { get; }
+		public int Id { get; private set; }
 		public string Name { get; private set; }
-		public string Description{get; private set; }
-		public bool IsActive{get; private set;}
+		public string Description { get; private set; }
+		public bool IsActive { get; private set; }
 
 
 
-		public Category(string name, string description)
+		public void SetId (int id)
 		{
-			Name = HandleName(name);
-			Description = HandleDescription(description);
+			Id = id;
+		}
+		public Category (string name, string description)
+		{
+			Name = HandleName (name);
+			Description = HandleDescription (description);
 			IsActive = true;
 		}
 
-		public void Rename(string newName)
+		public void Rename (string newName)
 		{
-			Name = HandleName(newName);
+			Name = HandleName (newName);
 		}
 
-		public void ChangeDescription(string newDescription)
+		public void ChangeDescription (string newDescription)
 		{
-			Description = HandleDescription(newDescription);
+			Description = HandleDescription (newDescription);
 		}
 
-		public void Activate()
+		public void Activate ()
 		{
 			IsActive = true;
 		}
 
-		public void Deactivate()
+		public void Deactivate ()
 		{
 			IsActive = false;
 		}
 
-		private string HandleName(string name)
+		private string HandleName (string name)
 		{
-			if (string.IsNullOrWhiteSpace(name))
+			if (string.IsNullOrWhiteSpace (name))
 			{
-				throw new InvalidNameException();
+				throw new InvalidNameException ();
 			}
 			else
 			{
-				return name.Trim();
-			}			
+				return name.Trim ();
+			}
 		}
 
-		private string HandleDescription(string description)
+		private string HandleDescription (string description)
 		{
 			if (string.IsNullOrWhiteSpace (description))
 			{
@@ -59,10 +63,10 @@ namespace InventoryManager.Domain.Entities
 
 			if (description.Length > 500)
 			{
-				throw new DescriptionTooLongException();
+				throw new DescriptionTooLongException ();
 			}
-				
-			return description.Trim();
+
+			return description.Trim ();
 		}
 	}
 }
