@@ -110,14 +110,7 @@ namespace InventoryManager.Domain.Entities
 
 		public void Rename (string newName)
 		{
-			if (string.IsNullOrWhiteSpace (newName))
-			{
-				throw new InvalidNameException ();
-			}
-			else
-			{
-				Name = newName.Trim ();
-			}
+			Name = HandleName (newName);
 		}
 
 		private string HandleSku (string sku)

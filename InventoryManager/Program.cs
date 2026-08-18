@@ -11,14 +11,16 @@ namespace InventoryManager
 			InMemoryProductRepository productRepository = new InMemoryProductRepository ();
 			InMemoryCategoryRepository categoryRepository = new InMemoryCategoryRepository ();
 			InMemorySupplierRepository supplierRepository = new InMemorySupplierRepository ();
+			InMemoryStockMovementRepository stockMovementRepository = new InMemoryStockMovementRepository ();
 
-			ProductService productService = new ProductService (productRepository);
+			StockMovementService stockMovementService = new StockMovementService (stockMovementRepository);
+			ProductService productService = new ProductService (productRepository, stockMovementService);
 			CategoryService categoryService = new CategoryService (categoryRepository);
 			SupplierService supplierService = new SupplierService (supplierRepository);
 
 			int opcion = 0;
 
-			while (opcion != 7)
+			while (opcion != 10)
 			{
 				Console.Clear ();
 
@@ -31,7 +33,10 @@ namespace InventoryManager
 				Console.WriteLine ("4. Listar productos");
 				Console.WriteLine ("5. Listar categorías");
 				Console.WriteLine ("6. Listar proveedores");
-				Console.WriteLine ("7. Salir");
+				Console.WriteLine ("7. Agregar stock");
+				Console.WriteLine ("8. Remover stock");
+				Console.WriteLine ("9. Ver movimientos");
+				Console.WriteLine ("10. Salir");
 				Console.WriteLine ("================================");
 				Console.Write ("Elegí una opción: ");
 
@@ -419,11 +424,140 @@ namespace InventoryManager
 						break;
 					}
 
+					case 7:
+					{
+						Console.Clear ();
+
+						Console.WriteLine ("=== AGREGAR STOCK ===");
+						Console.WriteLine ();
+
+						Console.Write ("ID de producto: ");
+
+						if (!int.TryParse (Console.ReadLine (), out int productId))
+						{
+							Console.WriteLine ("ID inválido.");
+							break;
+						}
+
+						Product? product = productService.GetById (productId);
+
+						if (product == null)
+						{
+							Console.WriteLine ("No existe un producto con ese ID.");
+							break;
+						}
+
+						Console.Write ("Cantidad a agregar: ");
+
+						if (!int.TryParse (Console.ReadLine (), out int quantity))
+						{
+							Console.WriteLine ("Cantidad inválida.");
+							break;
+						}
+
+						try
+						{
+							productService.UpdateStock (productId, quantity);
+
+							Console.WriteLine ();
+							Console.WriteLine ("Stock agregado correctamente.");
+							Console.WriteLine ($"Stock actual: {product.Stock}");
+						}
+						catch (Exception ex)
+						{
+							Console.WriteLine ();
+							Console.WriteLine ($"Error: {ex.Message}");
+						}
+
+						break;
+					}
+
+					case 8:
+					{
+						Console.Clear ();
+
+						Console.WriteLine ("=== REMOVER STOCK ===");
+						Console.WriteLine ();
+
+						Console.Write ("ID de producto: ");
+
+						if (!int.TryParse (Console.ReadLine (), out int productId))
+						{
+							Console.WriteLine ("ID inválido.");
+							break;
+						}
+
+						Product? product = productService.GetById (productId);
+
+						if (product == null)
+						{
+							Console.WriteLine ("No existe un producto con ese ID.");
+							break;
+						}
+
+						Console.Write ("Cantidad a remover: ");
+
+						if (!int.TryParse (Console.ReadLine (), out int quantity))
+						{
+							Console.WriteLine ("Cantidad inválida.");
+							break;
+						}
+
+						try
+						{
+							productService.UpdateStock (productId, -quantity);
+
+							Console.WriteLine ();
+							Console.WriteLine ("Stock removido correctamente.");
+							Console.WriteLine ($"Stock actual: {product.Stock}");
+						}
+						catch (Exception ex)
+						{
+							Console.WriteLine ();
+							Console.WriteLine ($"Error: {ex.Message}");
+						}
+
+						break;
+					}
+
+					case 9:
+					{
+						Console.Clear ();
+
+						Console.WriteLine ("=== MOVIMIENTOS DE STOCK ===");
+						Console.WriteLine ();
+
+						IEnumerable<StockMovement> movements = stockMovementService.GetMovements ();
+
+						if (!movements.Any ())
+						{
+							Console.WriteLine ("No hay movimientos registrados.");
+							break;
+						}
+
+						foreach (StockMovement movement in movements)
+						{
+							Product? product = productService.GetById (movement.ProductId);
+
+							string productName = product?.Name ?? "Producto no encontrado";
+
+							Console.WriteLine (
+								$"ID: {movement.Id} | " +
+								$"Producto: {productName} " +
+								$"(ID: {movement.ProductId}) | " +
+								$"Cantidad: {movement.Quantity} | " +
+								$"Tipo: {movement.Type} | " +
+								$"Fecha: {movement.CreatedAt}"
+							);
+						}
+
+						break;
+					}
 
 					// =========================================
 					// SALIR
 					// =========================================
-					case 7:
+					case 10:
 					{
 						Console.WriteLine ();
 						Console.WriteLine ("¡Hasta luego!");
@@ -439,12 +573,10 @@ namespace InventoryManager
 					}
 				}
 
-				if (opcion != 7)
+				if (opcion != 10)
 				{
 					Console.WriteLine ();
-					Console.WriteLine (
-						"Presioná ENTER para continuar..."
-					);
+					Console.WriteLine ("Presioná ENTER para continuar...");
 					Console.ReadLine ();
 				}
 			}
