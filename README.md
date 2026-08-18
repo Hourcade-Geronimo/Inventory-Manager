@@ -10,13 +10,12 @@ The project currently includes:
 - Product management
 - Category management
 - Supplier management
+- Stock movement tracking with history of stock entries and exits.
 - Product relationships with categories and suppliers
 - Domain validation and custom exceptions
 - Generic repository pattern
-- In-memory repositories for testing
+- In-memory repositories for testing only
+- SQLite db implemented for executable
 - Application services for each entity
 - Console-based interface
 
-Stock movement tracking is currently being implemented to keep a history of stock entries and exits.
-Afterwards exceptions will be implemented.
-A database in SQLite is planned to be implemented after the core functionalities are done.
