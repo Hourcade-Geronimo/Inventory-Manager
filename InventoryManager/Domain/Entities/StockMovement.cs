@@ -10,12 +10,12 @@ namespace InventoryManager.Domain.Entities
 		public int Quantity { get; private set; }
 		public MovementType Type { get; private set; }
 		public DateTime CreatedAt { get; private set; }
-		public StockMovement (int productId, int quantity, MovementType type, DateTime date)
+		public StockMovement (int productId, int quantity, MovementType type, DateTime createdAt)
 		{
 			ProductId = HandleProductId (productId);
 			Quantity = HandleQuantity (quantity);
 			Type = HandleType (type);
-			CreatedAt = HandleDate (date);
+			CreatedAt = HandleDate (createdAt);
 		}
 
 		public void SetId (int id)

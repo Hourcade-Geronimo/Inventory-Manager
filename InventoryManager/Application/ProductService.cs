@@ -1,6 +1,5 @@
 ﻿using InventoryManager.Domain.Entities;
 using InventoryManager.Domain.Enums;
-using InventoryManager.Domain.Exceptions;
 using InventoryManager.Domain.Interfaces;
 
 namespace InventoryManager.Application
@@ -64,7 +63,7 @@ namespace InventoryManager.Application
 				movementType = MovementType.Entry;
 				movementQuantity = quantity;
 			}
-			else if (quantity < 0)
+			else
 			{
 				int quantityToRemove = Math.Abs (quantity);
 
@@ -72,10 +71,6 @@ namespace InventoryManager.Application
 
 				movementType = MovementType.Exit;
 				movementQuantity = quantityToRemove;
-			}
-			else
-			{
-				throw new NegativeOrZeroQuantityException ();
 			}
 
 			_repository.Update (product);
