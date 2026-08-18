@@ -1,8 +1,11 @@
 ﻿using InventoryManager.Domain.Entities;
 
-public interface IStockMovementService
+namespace InventoryManager.Application
 {
-	void AddMovement (StockMovement movement);
-	IEnumerable<StockMovement> GetMovements ();
-	IEnumerable<StockMovement> GetByProductId (int productId);
+	public interface IStockMovementService
+	{
+		void AddMovement (StockMovement movement);
+		IEnumerable<StockMovement> GetMovements ();
+		IEnumerable<StockMovement> GetByProductId (int productId);
+	}
 }

@@ -18,9 +18,10 @@ namespace InventoryManager.Application
 
 		public void AddProduct (Product product)
 		{
-			StockMovement movement = new StockMovement (product.Id, product.Stock, MovementType.Entry, DateTime.UtcNow);
-
 			_repository.Add (product);
+
+			StockMovement movement = new StockMovement (product.Id, product.Stock, MovementType.Creation, DateTime.UtcNow);
+
 			_stockMovementService.AddMovement (movement);
 		}
 
@@ -56,7 +57,7 @@ namespace InventoryManager.Application
 			MovementType movementType;
 			int movementQuantity;
 
-			if (quantity > 0)
+			if (quantity >= 0)
 			{
 				product.AddStock (quantity);
 

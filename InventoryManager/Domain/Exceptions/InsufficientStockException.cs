@@ -1,7 +1,9 @@
 ﻿namespace InventoryManager.Domain.Exceptions
 {
-	internal class InsufficientStockException : Exception
+	public class InsufficientStockException : DomainException
 	{
-	//	todo
+		public InsufficientStockException () : base ("No hay suficiente stock disponible.")
+		{
+		}
 	}
 }

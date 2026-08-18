@@ -1,7 +1,9 @@
 ﻿namespace InventoryManager.Domain.Exceptions
 {
-	internal class InvalidMovementTypeException : Exception
+	public class InvalidMovementTypeException : DomainException
 	{
-		// todo
+		public InvalidMovementTypeException () : base ("El tipo de movimiento no es válido.")
+		{
+		}
 	}
 }

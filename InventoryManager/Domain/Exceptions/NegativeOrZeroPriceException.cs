@@ -1,7 +1,9 @@
 ﻿namespace InventoryManager.Domain.Exceptions
 {
-	internal class NegativeOrZeroPriceException : Exception
+	public class NegativeOrZeroPriceException : DomainException
 	{
-	//	todo
+		public NegativeOrZeroPriceException () : base ("El precio debe ser mayor que cero.")
+		{
+		}
 	}
 }

@@ -1,7 +1,9 @@
 ﻿namespace InventoryManager.Domain.Exceptions
 {
-	internal class InvalidMovementDateException : Exception
+	public class InvalidMovementDateException : DomainException
 	{
-		// todo
+		public InvalidMovementDateException () : base ("La fecha del movimiento no es válida.")
+		{
+		}
 	}
 }

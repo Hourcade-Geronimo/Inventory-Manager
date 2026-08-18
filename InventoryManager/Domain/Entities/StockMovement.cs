@@ -35,7 +35,7 @@ namespace InventoryManager.Domain.Entities
 
 		private int HandleQuantity (int quantity)
 		{
-			if (quantity <= 0)
+			if (quantity < 0)
 			{
 				throw new NegativeOrZeroQuantityException ();
 			}

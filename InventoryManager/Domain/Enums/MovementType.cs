@@ -2,6 +2,7 @@
 {
 	public enum MovementType
 	{
+		Creation,
 		Entry,
 		Exit
 	}

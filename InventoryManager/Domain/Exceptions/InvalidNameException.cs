@@ -1,7 +1,9 @@
 ﻿namespace InventoryManager.Domain.Exceptions
 {
-	internal class InvalidNameException : Exception
+	public class InvalidNameException : DomainException
 	{
-	//	todo
+		public InvalidNameException () : base ("El nombre no puede estar vacío.")
+		{
+		}
 	}
 }
