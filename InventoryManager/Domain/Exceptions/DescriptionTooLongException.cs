@@ -1,7 +1,9 @@
 ﻿namespace InventoryManager.Domain.Exceptions
 {
-	internal class DescriptionTooLongException : Exception
+	public class DescriptionTooLongException : DomainException
 	{
-		//todo
+		public DescriptionTooLongException () : base ("La descripción no puede superar los 500 caracteres.")
+		{
+		}
 	}
 }

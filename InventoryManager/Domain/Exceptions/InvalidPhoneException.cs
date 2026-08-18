@@ -1,7 +1,9 @@
 ﻿namespace InventoryManager.Domain.Exceptions
 {
-	internal class InvalidPhoneException : Exception
+	public class InvalidPhoneException : DomainException
 	{
-		// todo
+		public InvalidPhoneException () : base ("El número de teléfono no es válido.")
+		{
+		}
 	}
 }

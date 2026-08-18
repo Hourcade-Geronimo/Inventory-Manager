@@ -1,7 +1,9 @@
 ﻿namespace InventoryManager.Domain.Exceptions
 {
-	internal class NegativeOrZeroQuantityException : Exception
+	public class NegativeOrZeroQuantityException : DomainException
 	{
-	//	todo
+		public NegativeOrZeroQuantityException () : base ("La cantidad debe ser mayor que cero.")
+		{
+		}
 	}
 }

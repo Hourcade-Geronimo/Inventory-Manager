@@ -1,6 +1,8 @@
 ﻿using InventoryManager.Application;
 using InventoryManager.Domain.Entities;
+using InventoryManager.Infrastructure.Data;
 using InventoryManager.Infrastructure.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManager
 {
@@ -8,17 +10,44 @@ namespace InventoryManager
 	{
 		public static void Main (string [] args)
 		{
-			InMemoryProductRepository productRepository = new InMemoryProductRepository ();
-			InMemoryCategoryRepository categoryRepository = new InMemoryCategoryRepository ();
-			InMemorySupplierRepository supplierRepository = new InMemorySupplierRepository ();
+			string databasePath = Path.Combine (AppContext.BaseDirectory, "inventory.db");
 
-			ProductService productService = new ProductService (productRepository);
-			CategoryService categoryService = new CategoryService (categoryRepository);
-			SupplierService supplierService = new SupplierService (supplierRepository);
+			DbContextOptions<InventoryContext> options =
+				new DbContextOptionsBuilder<InventoryContext> ()
+					.UseSqlite ($"Data Source={databasePath}")
+					.Options;
+
+			using InventoryContext context = new InventoryContext (options);
+
+			context.Database.EnsureCreated ();
+
+			Repository<Product> productRepository =
+				new Repository<Product> (context);
+
+			Repository<Category> categoryRepository =
+				new Repository<Category> (context);
+
+			Repository<Supplier> supplierRepository =
+				new Repository<Supplier> (context);
+
+			Repository<StockMovement> stockMovementRepository =
+				new Repository<StockMovement> (context);
+
+			StockMovementService stockMovementService =
+				new StockMovementService (stockMovementRepository);
+
+			ProductService productService =
+				new ProductService (productRepository, stockMovementService);
+
+			CategoryService categoryService =
+				new CategoryService (categoryRepository);
+
+			SupplierService supplierService =
+				new SupplierService (supplierRepository);
 
 			int opcion = 0;
 
-			while (opcion != 7)
+			while (opcion != 10)
 			{
 				Console.Clear ();
 
@@ -31,7 +60,10 @@ namespace InventoryManager
 				Console.WriteLine ("4. Listar productos");
 				Console.WriteLine ("5. Listar categorías");
 				Console.WriteLine ("6. Listar proveedores");
-				Console.WriteLine ("7. Salir");
+				Console.WriteLine ("7. Agregar stock");
+				Console.WriteLine ("8. Remover stock");
+				Console.WriteLine ("9. Ver movimientos");
+				Console.WriteLine ("10. Salir");
 				Console.WriteLine ("================================");
 				Console.Write ("Elegí una opción: ");
 
@@ -51,29 +83,32 @@ namespace InventoryManager
 					{
 						Console.Clear ();
 
-						IEnumerable<Category> categories = categoryService.GetCategories ();
-						IEnumerable<Supplier> suppliers = supplierService.GetSuppliers ();
+						IEnumerable<Category> categories =
+							categoryService.GetCategories ();
+
+						IEnumerable<Supplier> suppliers =
+							supplierService.GetSuppliers ();
 
 						if (!categories.Any ())
 						{
 							Console.WriteLine ("No podés crear un producto.");
-							Console.WriteLine ("Primero tenés que crear al menos una categoría.");
+							Console.WriteLine (
+								"Primero tenés que crear al menos una categoría."
+							);
 							break;
 						}
 
 						if (!suppliers.Any ())
 						{
 							Console.WriteLine ("No podés crear un producto.");
-							Console.WriteLine ("Primero tenés que crear al menos un proveedor.");
+							Console.WriteLine (
+								"Primero tenés que crear al menos un proveedor."
+							);
 							break;
 						}
 
 						Console.WriteLine ("=== AGREGAR PRODUCTO ===");
 						Console.WriteLine ();
-
-						// -----------------------------------------
-						// CATEGORÍA
-						// -----------------------------------------
 
 						Console.WriteLine ("¿A qué categoría pertenece?");
 						Console.WriteLine ();
@@ -88,13 +123,16 @@ namespace InventoryManager
 						Console.WriteLine ();
 						Console.Write ("ID de categoría: ");
 
-						if (!int.TryParse (Console.ReadLine (), out int categoryId))
+						if (!int.TryParse (
+							Console.ReadLine (),
+							out int categoryId))
 						{
 							Console.WriteLine ("ID inválido.");
 							break;
 						}
 
-						Category? categorySelected = categoryService.GetById (categoryId);
+						Category? categorySelected =
+							categoryService.GetById (categoryId);
 
 						if (categorySelected == null)
 						{
@@ -103,10 +141,6 @@ namespace InventoryManager
 							);
 							break;
 						}
-
-						// -----------------------------------------
-						// PROVEEDOR
-						// -----------------------------------------
 
 						Console.WriteLine ();
 						Console.WriteLine ("¿Cuál es el proveedor?");
@@ -122,13 +156,16 @@ namespace InventoryManager
 						Console.WriteLine ();
 						Console.Write ("ID de proveedor: ");
 
-						if (!int.TryParse (Console.ReadLine (), out int supplierId))
+						if (!int.TryParse (
+							Console.ReadLine (),
+							out int supplierId))
 						{
 							Console.WriteLine ("ID inválido.");
 							break;
 						}
 
-						Supplier? supplierSelected = supplierService.GetById (supplierId);
+						Supplier? supplierSelected =
+							supplierService.GetById (supplierId);
 
 						if (supplierSelected == null)
 						{
@@ -137,10 +174,6 @@ namespace InventoryManager
 							);
 							break;
 						}
-
-						// -----------------------------------------
-						// DATOS DEL PRODUCTO
-						// -----------------------------------------
 
 						Console.WriteLine ();
 						Console.Write ("Nombre: ");
@@ -183,10 +216,16 @@ namespace InventoryManager
 							productService.AddProduct (product);
 
 							Console.WriteLine ();
-							Console.WriteLine ("Producto agregado correctamente.");
+							Console.WriteLine (
+								"Producto agregado correctamente."
+							);
 							Console.WriteLine ($"ID: {product.Id}");
-							Console.WriteLine ($"Categoría: {categorySelected.Name}");
-							Console.WriteLine ($"Proveedor: {supplierSelected.Name}");
+							Console.WriteLine (
+								$"Categoría: {categorySelected.Name}"
+							);
+							Console.WriteLine (
+								$"Proveedor: {supplierSelected.Name}"
+							);
 						}
 						catch (Exception ex)
 						{
@@ -196,7 +235,6 @@ namespace InventoryManager
 
 						break;
 					}
-
 
 					// =========================================
 					// AGREGAR CATEGORÍA
@@ -216,10 +254,8 @@ namespace InventoryManager
 
 						try
 						{
-							Category category = new Category (
-								name,
-								description
-							);
+							Category category =
+								new Category (name, description);
 
 							categoryService.AddCategory (category);
 
@@ -240,7 +276,6 @@ namespace InventoryManager
 						break;
 					}
 
-
 					// =========================================
 					// AGREGAR PROVEEDOR
 					// =========================================
@@ -259,10 +294,8 @@ namespace InventoryManager
 
 						try
 						{
-							Supplier supplier = new Supplier (
-								name,
-								phone
-							);
+							Supplier supplier =
+								new Supplier (name, phone);
 
 							supplierService.AddSupplier (supplier);
 
@@ -282,7 +315,6 @@ namespace InventoryManager
 
 						break;
 					}
-
 
 					// =========================================
 					// LISTAR PRODUCTOS
@@ -349,7 +381,6 @@ namespace InventoryManager
 						break;
 					}
 
-
 					// =========================================
 					// LISTAR CATEGORÍAS
 					// =========================================
@@ -383,7 +414,6 @@ namespace InventoryManager
 
 						break;
 					}
-
 
 					// =========================================
 					// LISTAR PROVEEDORES
@@ -419,17 +449,190 @@ namespace InventoryManager
 						break;
 					}
 
+					// =========================================
+					// AGREGAR STOCK
+					// =========================================
+					case 7:
+					{
+						Console.Clear ();
+
+						Console.WriteLine ("=== AGREGAR STOCK ===");
+						Console.WriteLine ();
+
+						Console.Write ("ID de producto: ");
+
+						if (!int.TryParse (
+							Console.ReadLine (),
+							out int productId))
+						{
+							Console.WriteLine ("ID inválido.");
+							break;
+						}
+
+						Product? product =
+							productService.GetById (productId);
+
+						if (product == null)
+						{
+							Console.WriteLine (
+								"No existe un producto con ese ID."
+							);
+							break;
+						}
+
+						Console.Write ("Cantidad a agregar: ");
+
+						if (!int.TryParse (
+							Console.ReadLine (),
+							out int quantity))
+						{
+							Console.WriteLine ("Cantidad inválida.");
+							break;
+						}
+
+						try
+						{
+							productService.UpdateStock (
+								productId,
+								quantity
+							);
+
+							Console.WriteLine ();
+							Console.WriteLine (
+								"Stock agregado correctamente."
+							);
+							Console.WriteLine (
+								$"Stock actual: {product.Stock}"
+							);
+						}
+						catch (Exception ex)
+						{
+							Console.WriteLine ();
+							Console.WriteLine ($"Error: {ex.Message}");
+						}
+
+						break;
+					}
+
+					// =========================================
+					// REMOVER STOCK
+					// =========================================
+					case 8:
+					{
+						Console.Clear ();
+
+						Console.WriteLine ("=== REMOVER STOCK ===");
+						Console.WriteLine ();
+
+						Console.Write ("ID de producto: ");
+
+						if (!int.TryParse (
+							Console.ReadLine (),
+							out int productId))
+						{
+							Console.WriteLine ("ID inválido.");
+							break;
+						}
+
+						Product? product =
+							productService.GetById (productId);
+
+						if (product == null)
+						{
+							Console.WriteLine (
+								"No existe un producto con ese ID."
+							);
+							break;
+						}
+
+						Console.Write ("Cantidad a remover: ");
+
+						if (!int.TryParse (
+							Console.ReadLine (),
+							out int quantity))
+						{
+							Console.WriteLine ("Cantidad inválida.");
+							break;
+						}
+
+						try
+						{
+							productService.UpdateStock (
+								productId,
+								-quantity
+							);
+
+							Console.WriteLine ();
+							Console.WriteLine (
+								"Stock removido correctamente."
+							);
+							Console.WriteLine (
+								$"Stock actual: {product.Stock}"
+							);
+						}
+						catch (Exception ex)
+						{
+							Console.WriteLine ();
+							Console.WriteLine ($"Error: {ex.Message}");
+						}
+
+						break;
+					}
+
+					// =========================================
+					// VER MOVIMIENTOS
+					// =========================================
+					case 9:
+					{
+						Console.Clear ();
+
+						Console.WriteLine ("=== MOVIMIENTOS DE STOCK ===");
+						Console.WriteLine ();
+
+						IEnumerable<StockMovement> movements =
+							stockMovementService.GetMovements ();
+
+						if (!movements.Any ())
+						{
+							Console.WriteLine (
+								"No hay movimientos registrados."
+							);
+							break;
+						}
+
+						foreach (StockMovement movement in movements)
+						{
+							Product? product =
+								productService.GetById (
+									movement.ProductId
+								);
+
+							string productName =
+								product?.Name ??
+								"Producto no encontrado";
+
+							Console.WriteLine (
+								$"ID: {movement.Id} | " +
+								$"Producto: {productName} " +
+								$"(ID: {movement.ProductId}) | " +
+								$"Cantidad: {movement.Quantity} | " +
+								$"Tipo: {movement.Type} | " +
+								$"Fecha: {movement.CreatedAt}"
+							);
+						}
+
+						break;
+					}
 
 					// =========================================
 					// SALIR
 					// =========================================
-					case 7:
+					case 10:
 					{
 						Console.WriteLine ();
 						Console.WriteLine ("¡Hasta luego!");
 						break;
 					}
-
 
 					default:
 					{
@@ -439,7 +642,7 @@ namespace InventoryManager
 					}
 				}
 
-				if (opcion != 7)
+				if (opcion != 10)
 				{
 					Console.WriteLine ();
 					Console.WriteLine (
